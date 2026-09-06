@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bug反馈平台 - 更好的饮水 | loveaitiangongzuoshi.github.io/Better_Drinking</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="header">
+<div class="header-inner">
+<a class="logo" onclick="showPage('home')">
+<span class="logo-dot">B</span>
+<span data-zh="Bug反馈平台" data-en="Bug Tracker">Bug反馈平台</span>
+</a>
+<nav class="nav">
+<a class="active" data-page="home" onclick="showPage('home')" data-zh="首页" data-en="Home">首页</a>
+<a data-page="submit" onclick="showPage('submit')" data-zh="提交Bug" data-en="Submit">提交Bug</a>
+<a data-page="list" onclick="showPage('list')" data-zh="Bug列表" data-en="List">Bug列表</a>
+<a id="admin-nav-btn" class="admin-btn" onclick="openAdmin()" data-zh="后台管理" data-en="Admin">后台管理</a>
+<button class="lang-btn" onclick="toggleLang()" id="langBtn">EN</button>
+</nav>
+</div>
+</header>
+
+<div class="container">
+
+<!-- 首页 -->
+<div class="page active" id="page-home">
+<div class="hero">
+<h1 data-zh="更好的饮水 - Bug反馈平台" data-en="Better Drinking - Bug Tracker">更好的饮水 - Bug反馈平台</h1>
+<p data-zh="帮助我们发现并修复模组中的问题，让游戏体验更好" data-en="Help us find and fix bugs in the mod for a better gaming experience">帮助我们发现并修复模组中的问题，让游戏体验更好</p>
+<div class="btn-group">
+<button class="btn btn-primary" onclick="showPage('submit')" data-zh="提交Bug" data-en="Submit Bug">提交Bug</button>
+<button class="btn btn-outline" onclick="showPage('list')" data-zh="查看Bug列表" data-en="View List">查看Bug列表</button>
+</div>
+</div>
+<div class="stats">
+<div class="stat-card"><div class="stat-num" id="stat-total">0</div><div class="stat-label" data-zh="已提交" data-en="Submitted">已提交</div></div>
+<div class="stat-card"><div class="stat-num" id="stat-processing">0</div><div class="stat-label" data-zh="处理中" data-en="Processing">处理中</div></div>
+<div class="stat-card"><div class="stat-num" id="stat-resolved">0</div><div class="stat-label" data-zh="已修复" data-en="Fixed">已修复</div></div>
+</div>
+
+<div class="list-header" style="margin-top:8px">
+<h3 data-zh="最新Bug" data-en="Latest Bugs">最新Bug</h3>
+<a style="cursor:pointer;color:#1976d2;font-size:13px;text-decoration:underline" onclick="showPage('list')" data-zh="查看全部" data-en="View All">查看全部</a>
+</div>
+<div class="bug-list" id="home-bug-list"></div>
+
+<div class="info-box">
+<h3 data-zh="Bug编号规则" data-en="Bug ID Format">Bug编号规则</h3>
+<p data-zh="Bug编号格式为 W-X（X为从1开始的正整数，按从小到大顺序排列，无上限）。编号由系统自动生成，无需手动填写。示例：W-1, W-2, W-3 ... W-10, W-11" data-en="Bug ID format: W-X (X is a positive integer starting from 1, sorted in ascending order, no upper limit). IDs are auto-generated. Examples: W-1, W-2, W-3 ... W-10, W-11">Bug编号格式为 W-X（X为从1开始的正整数，按从小到大顺序排列，无上限）。编号由系统自动生成，无需手动填写。示例：W-1, W-2, W-3 ... W-10, W-11</p>
+</div>
+<div class="privacy-note" data-zh="您的隐私对我们很重要，所有提交的信息仅用于模组Bug修复。" data-en="Your privacy matters. All submitted info is used only for bug fixing.">您的隐私对我们很重要，所有提交的信息仅用于模组Bug修复。</div>
+</div>
+
+<!-- 提交页 -->
+<div class="page" id="page-submit">
+<div class="form-card">
+<h2 class="form-title" data-zh="提交Bug反馈" data-en="Submit Bug Report">提交Bug反馈</h2>
+<p class="form-sub" data-zh="请详细描述您遇到的问题，帮助我们更好地修复" data-en="Please describe the issue in detail to help us fix it">请详细描述您遇到的问题，帮助我们更好地修复</p>
+
+<div id="success-box" class="success-box" style="display:none">
+<h3 data-zh="提交成功！" data-en="Submitted Successfully!">提交成功！</h3>
+<p data-zh="感谢您的反馈，我们会尽快处理" data-en="Thank you for your feedback, we will process it soon">感谢您的反馈，我们会尽快处理</p>
+<div class="bid" id="new-bug-id">W-1</div>
+<button class="btn btn-primary" onclick="showPage('list')" data-zh="查看Bug列表" data-en="View List">查看Bug列表</button>
+<button class="btn btn-outline" onclick="resetForm()" data-zh="继续提交" data-en="Submit Another">继续提交</button>
+</div>
+
+<div id="form-area">
+<div class="next-id" data-zh="下一个Bug编号：" data-en="Next Bug ID: ">下一个Bug编号：<strong id="next-id-display">W-1</strong> <span data-zh="（系统自动生成，无需填写）" data-en="(auto-generated, no need to fill)">（系统自动生成，无需填写）</span></div>
+<div class="privacy-banner" data-zh="我们承诺保护您的个人信息，仅用于Bug反馈沟通，不会用于任何商业用途。" data-en="We protect your personal info, used only for bug communication, never for commercial use.">我们承诺保护您的个人信息，仅用于Bug反馈沟通，不会用于任何商业用途。</div>
+
+<form id="bug-form" onsubmit="return submitBug(event)">
+<div class="form-group">
+<label class="form-label" data-zh="Bug标题" data-en="Bug Title">Bug标题 <span class="req">*</span></label>
+<input type="text" class="form-input" id="f-title" required placeholder="简要描述Bug内容">
+</div>
+
+<div class="form-row">
+<div class="form-group">
+<label class="form-label" data-zh="严重程度" data-en="Severity">严重程度 <span class="req">*</span></label>
+<div class="sev-opts">
+<div class="sev-opt sev-minor sel" data-val="minor" onclick="selectSev(this)" data-zh="轻微" data-en="Minor">轻微</div>
+<div class="sev-opt sev-moderate" data-val="moderate" onclick="selectSev(this)" data-zh="一般" data-en="Moderate">一般</div>
+<div class="sev-opt sev-severe" data-val="severe" onclick="selectSev(this)" data-zh="严重" data-en="Severe">严重</div>
+<div class="sev-opt sev-critical" data-val="critical" onclick="selectSev(this)" data-zh="致命" data-en="Critical">致命</div>
+<div class="sev-opt sev-improvement" data-val="improvement" onclick="selectSev(this)" data-zh="改进建议" data-en="Improvement">改进建议</div>
+</div>
+</div>
+<div class="form-group" id="field-module">
+<label class="form-label" data-zh="影响模块" data-en="Affected Module">影响模块 <span class="opt" data-zh="(选填)" data-en="(optional)">(选填)</span></label>
+<input type="text" class="form-input" id="f-module" placeholder="如：饮水机制、合成系统">
+</div>
+</div>
+
+<div class="form-group" id="field-desc">
+<label class="form-label" data-zh="Bug描述" data-en="Description">Bug描述 <span class="req">*</span></label>
+<textarea class="form-textarea" id="f-desc" required placeholder="详细描述Bug的现象、发生条件等"></textarea>
+</div>
+
+<div class="form-group" id="field-steps">
+<label class="form-label" id="label-steps" data-zh="复现步骤" data-en="Steps to Reproduce">复现步骤 <span class="req">*</span></label>
+<textarea class="form-textarea" id="f-steps" required placeholder="1. 第一步...&#10;2. 第二步...&#10;3. ..."></textarea>
+</div>
+
+<div class="form-row">
+<div class="form-group">
+<label class="form-label" data-zh="姓名/昵称" data-en="Name">姓名/昵称 <span class="req">*</span></label>
+<input type="text" class="form-input" id="f-name" required placeholder="您的称呼">
+</div>
+<div class="form-group">
+<label class="form-label" data-zh="邮箱" data-en="Email">邮箱 <span class="opt" data-zh="(选填)" data-en="(optional)">(选填)</span></label>
+<input type="email" class="form-input" id="f-email" placeholder="用于接收修复进度通知">
+</div>
+</div>
+
+<button type="submit" class="submit-btn" data-zh="提交Bug" data-en="Submit Bug">提交Bug</button>
+</form>
+</div>
+</div>
+</div>
+
+<!-- 列表页 -->
+<div class="page" id="page-list">
+<div class="list-header">
+<h2 class="list-title" data-zh="Bug列表" data-en="Bug List">Bug列表</h2>
+<div class="filters">
+<select class="filter-sel" id="filter-status" onchange="renderList()">
+<option value="all" data-zh="全部状态" data-en="All Status">全部状态</option>
+<option value="pending" data-zh="待修复" data-en="Pending">待修复</option>
+<option value="processing" data-zh="处理中" data-en="Processing">处理中</option>
+<option value="resolved" data-zh="已修复" data-en="Resolved">已修复</option>
+<option value="wontfix" data-zh="不予修复" data-en="Won't Fix">不予修复</option>
+<option value="feature" data-zh="特性" data-en="Feature">特性</option>
+</select>
+<select class="filter-sel" id="filter-severity" onchange="renderList()">
+<option value="all" data-zh="全部严重程度" data-en="All Severity">全部严重程度</option>
+<option value="minor" data-zh="轻微" data-en="Minor">轻微</option>
+<option value="moderate" data-zh="一般" data-en="Moderate">一般</option>
+<option value="severe" data-zh="严重" data-en="Severe">严重</option>
+<option value="critical" data-zh="致命" data-en="Critical">致命</option>
+<option value="improvement" data-zh="改进建议" data-en="Improvement">改进建议</option>
+</select>
+</div>
+</div>
+<div class="bug-list" id="bug-list-container"></div>
+</div>
+
+<!-- 后台管理页 -->
+<div class="page" id="page-admin">
+<div class="admin-header">
+<h2 class="list-title" data-zh="后台管理" data-en="Admin Panel">后台管理</h2>
+<div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+<span class="admin-info" id="admin-status"></span>
+<button class="btn btn-danger btn-small" onclick="logout()" data-zh="退出登录" data-en="Logout">退出登录</button>
+</div>
+</div>
+<div class="stats">
+<div class="stat-card"><div class="stat-num" id="admin-stat-total">0</div><div class="stat-label" data-zh="总Bug数" data-en="Total">总Bug数</div></div>
+<div class="stat-card"><div class="stat-num" id="admin-stat-pending">0</div><div class="stat-label" data-zh="待修复" data-en="Pending">待修复</div></div>
+<div class="stat-card"><div class="stat-num" id="admin-stat-processing">0</div><div class="stat-label" data-zh="处理中" data-en="Processing">处理中</div></div>
+<div class="stat-card"><div class="stat-num" id="admin-stat-resolved">0</div><div class="stat-label" data-zh="已解决" data-en="Resolved">已解决</div></div>
+</div>
+<div class="list-header">
+<h3 data-zh="Bug管理列表" data-en="Bug Management">Bug管理列表</h3>
+<div class="filters">
+<select class="filter-sel" id="admin-filter-status" onchange="renderAdminList()">
+<option value="all" data-zh="全部状态" data-en="All Status">全部状态</option>
+<option value="pending" data-zh="待修复" data-en="Pending">待修复</option>
+<option value="processing" data-zh="处理中" data-en="Processing">处理中</option>
+<option value="resolved" data-zh="已修复" data-en="Resolved">已修复</option>
+<option value="wontfix" data-zh="不予修复" data-en="Won't Fix">不予修复</option>
+<option value="feature" data-zh="特性" data-en="Feature">特性</option>
+</select>
+</div>
+</div>
+<div class="bug-list" id="admin-list-container"></div>
+</div>
+
+</div>
+
+<!-- 登录弹窗 -->
+<div class="modal-overlay" id="login-modal">
+<div class="modal">
+<span class="modal-close" onclick="closeLogin()">&times;</span>
+<h2 data-zh="管理员登录" data-en="Admin Login">管理员登录</h2>
+<p data-zh="请输入管理密钥进入后台" data-en="Enter admin key to access the panel">请输入管理密钥进入后台</p>
+<input type="password" class="form-input" id="admin-key-input" placeholder="密钥" onkeydown="if(event.key==='Enter')doLogin()">
+<div class="error-msg" id="login-error" data-zh="密钥错误，请重试" data-en="Wrong key, please try again">密钥错误，请重试</div>
+<button class="btn btn-primary" style="width:100%;margin-top:16px" onclick="doLogin()" data-zh="登录" data-en="Login">登录</button>
+</div>
+</div>
+
+<footer class="footer">
+<p>&copy; 2026 Bug反馈平台 | loveaitiangongzuoshi.github.io/Better_Drinking</p>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="script.js"></script>
+</body>
+</html>
