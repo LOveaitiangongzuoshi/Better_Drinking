@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bug反馈平台 - 更好的饮水 | loveaitiangongzuoshi.github.io/Better_Drinking</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:Arial,"Microsoft YaHei",sans-serif;background:#f0f2f5;color:#333;line-height:1.6}
+.header{background:#fff;border-bottom:1px solid #e0e0e0;padding:0 20px;position:sticky;top:0;z-index:100}
+.header-inner{max-width:1100px;margin:0 auto;display:flex;justify-content:space-between;align-items:center;height:60px;flex-wrap:wrap}
+.logo{font-size:18px;font-weight:bold;color:#1976d2;cursor:pointer;text-decoration:none;display:flex;align-items:center;gap:8px}
+.logo-dot{width:28px;height:28px;background:#1976d2;border-radius:6px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:14px}
+.nav{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.nav a{padding:8px 14px;border-radius:6px;text-decoration:none;color:#555;font-size:14px;transition:all .2s;cursor:pointer}
+.nav a:hover{background:#e3f2fd;color:#1976d2}
+.nav a.active{background:#1976d2;color:#fff}
+.nav a.admin-btn{background:#ff9800;color:#fff}
+.nav a.admin-btn:hover{background:#f57c00}
+.lang-btn{padding:6px 12px;border:1px solid #ddd;border-radius:6px;background:#fff;cursor:pointer;font-size:13px}
+.container{max-width:1100px;margin:0 auto;padding:24px 20px}
+.page{display:none}
+.page.active{display:block}
+.hero{text-align:center;padding:50px 20px}
+.hero h1{font-size:32px;margin-bottom:12px;color:#222}
+.hero p{font-size:16px;color:#666;margin-bottom:28px}
+.btn-group{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+.btn{padding:12px 24px;border-radius:8px;font-size:15px;cursor:pointer;border:none;transition:all .2s;font-weight:500;text-decoration:none;display:inline-block}
+.btn-primary{background:#1976d2;color:#fff}
+.btn-primary:hover{background:#1565c0}
+.btn-outline{background:#fff;color:#1976d2;border:1px solid #1976d2}
+.btn-outline:hover{background:#e3f2fd}
+.btn-danger{background:#f44336;color:#fff}
+.btn-danger:hover{background:#d32f2f}
+.btn-small{padding:6px 12px;font-size:12px;border-radius:4px}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:16px;margin:32px 0}
+.stat-card{background:#fff;padding:20px;border-radius:10px;text-align:center;border:1px solid #e8e8e8}
+.stat-num{font-size:32px;font-weight:bold;color:#1976d2;margin-bottom:4px}
+.stat-label{font-size:13px;color:#888}
+.info-box{background:#e3f2fd;border-left:4px solid #1976d2;padding:16px 20px;border-radius:6px;margin:20px 0}
+.info-box h3{font-size:15px;margin-bottom:6px;color:#1565c0}
+.info-box p{font-size:14px;color:#444}
+.privacy-note{text-align:center;font-size:12px;color:#999;margin-top:40px;padding:16px}
+.form-card{background:#fff;padding:28px;border-radius:10px;max-width:680px;margin:0 auto;border:1px solid #e8e8e8}
+.form-title{font-size:22px;margin-bottom:6px;color:#222}
+.form-sub{font-size:13px;color:#888;margin-bottom:20px}
+.next-id{background:#f5f5f5;padding:10px 14px;border-radius:6px;font-size:13px;color:#555;margin-bottom:16px}
+.next-id strong{color:#1976d2}
+.privacy-banner{background:#e8f5e9;border:1px solid #a5d6a7;padding:10px 14px;border-radius:6px;font-size:12px;color:#2e7d32;margin-bottom:20px}
+.success-box{background:#e8f5e9;border:1px solid #a5d6a7;padding:24px;border-radius:8px;text-align:center;margin-bottom:20px}
+.success-box h3{color:#2e7d32;margin-bottom:8px}
+.success-box .bid{font-size:22px;font-weight:bold;color:#1976d2;margin:12px 0}
+.form-group{margin-bottom:16px}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.form-label{display:block;font-size:13px;font-weight:600;margin-bottom:5px;color:#444}
+.req{color:#e53935}
+.opt{color:#aaa;font-weight:normal;font-size:11px;margin-left:4px}
+.form-input,.form-select,.form-textarea{width:100%;padding:9px 12px;border:1px solid #ddd;border-radius:6px;font-size:14px;font-family:inherit;transition:border-color .2s}
+.form-input:focus,.form-select:focus,.form-textarea:focus{outline:none;border-color:#1976d2}
+.form-textarea{resize:vertical;min-height:90px}
+.form-hint{font-size:11px;color:#aaa;margin-top:3px}
+.sev-opts{display:flex;gap:6px;flex-wrap:wrap}
+.sev-opt{flex:1;min-width:80px;padding:9px 6px;border:2px solid #ddd;border-radius:6px;text-align:center;cursor:pointer;font-size:12px;transition:all .2s;user-select:none}
+.sev-opt:hover{border-color:#999}
+.sev-opt.sel{border-color:currentColor;font-weight:600}
+.sev-minor{color:#43a047}.sev-minor.sel{background:#e8f5e9}
+.sev-moderate{color:#fb8c00}.sev-moderate.sel{background:#fff3e0}
+.sev-severe{color:#e53935}.sev-severe.sel{background:#ffebee}
+.sev-critical{color:#8e24aa}.sev-critical.sel{background:#f3e5f5}
+.sev-improvement{color:#00838f}.sev-improvement.sel{background:#e0f7fa}
+.submit-btn{width:100%;padding:13px;background:#1976d2;color:#fff;border:none;border-radius:8px;font-size:15px;font-weight:600;cursor:pointer;transition:background .2s}
+.submit-btn:hover{background:#1565c0}
+.list-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;flex-wrap:wrap;gap:10px}
+.list-title{font-size:22px}
+.filters{display:flex;gap:8px;flex-wrap:wrap}
+.filter-sel{padding:7px 10px;border:1px solid #ddd;border-radius:6px;font-size:13px}
+.bug-list{display:flex;flex-direction:column;gap:12px}
+.bug-item{background:#fff;padding:18px 20px;border-radius:10px;border:1px solid #e8e8e8}
+.bug-head{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px;flex-wrap:wrap;gap:8px}
+.bug-id{font-weight:600;color:#1976d2;font-size:14px}
+.bug-status{padding:3px 10px;border-radius:10px;font-size:11px;font-weight:600}
+.st-pending{background:#fff9c4;color:#f9a825}
+.st-processing{background:#e3f2fd;color:#1565c0}
+.st-resolved{background:#e8f5e9;color:#2e7d32}
+.st-wontfix{background:#ffebee;color:#c62828}
+.st-feature{background:#f3e5f5;color:#7b1fa2}
+.bug-title{font-size:16px;font-weight:600;margin-bottom:6px;color:#222}
+.bug-meta{display:flex;gap:12px;font-size:12px;color:#888;flex-wrap:wrap;margin-bottom:6px}
+.bug-sev{padding:2px 7px;border-radius:4px;font-size:11px;font-weight:600}
+.bug-desc{font-size:13px;color:#555;margin-bottom:6px;white-space:pre-wrap}
+.bug-steps{font-size:12px;color:#777;background:#f9f9f9;padding:8px 12px;border-radius:6px;white-space:pre-wrap}
+.bug-email{font-size:12px;color:#1976d2;margin-top:6px}
+.bug-actions{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}
+.empty{text-align:center;padding:60px 20px;color:#aaa}
+.empty-icon{font-size:42px;margin-bottom:12px}
+.footer{text-align:center;padding:24px 20px;color:#aaa;font-size:12px;border-top:1px solid #e8e8e8;margin-top:40px}
+
+/* 登录弹窗 */
+.modal-overlay{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);z-index:1000;justify-content:center;align-items:center}
+.modal-overlay.show{display:flex}
+.modal{background:#fff;padding:32px;border-radius:12px;max-width:400px;width:90%;box-shadow:0 10px 40px rgba(0,0,0,0.2)}
+.modal h2{font-size:20px;margin-bottom:8px;color:#222}
+.modal p{font-size:13px;color:#888;margin-bottom:20px}
+.modal .error-msg{color:#f44336;font-size:13px;margin-top:8px;display:none}
+.modal-close{float:right;cursor:pointer;color:#999;font-size:20px;line-height:1}
+.admin-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;flex-wrap:wrap;gap:10px}
+.admin-info{font-size:13px;color:#666}
+@media(max-width:640px){
+.form-row{grid-template-columns:1fr}
+.hero h1{font-size:24px}
+.form-card{padding:18px}
+}
+</style>
+</head>
+<body>
+
+<header class="header">
+<div class="header-inner">
+<a class="logo" onclick="showPage('home')">
+<span class="logo-dot">B</span>
+<span data-zh="Bug反馈平台" data-en="Bug Tracker">Bug反馈平台</span>
+</a>
+<nav class="nav">
+<a class="active" data-page="home" onclick="showPage('home')" data-zh="首页" data-en="Home">首页</a>
+<a data-page="submit" onclick="showPage('submit')" data-zh="提交Bug" data-en="Submit">提交Bug</a>
+<a data-page="list" onclick="showPage('list')" data-zh="Bug列表" data-en="List">Bug列表</a>
+<a id="admin-nav-btn" class="admin-btn" onclick="openAdmin()" data-zh="后台管理" data-en="Admin">后台管理</a>
+<button class="lang-btn" onclick="toggleLang()" id="langBtn">EN</button>
+</nav>
+</div>
+</header>
+
+<div class="container">
+
+<!-- 首页 -->
+<div class="page active" id="page-home">
+<div class="hero">
+<h1 data-zh="更好的饮水 - Bug反馈平台" data-en="Better Drinking - Bug Tracker">更好的饮水 - Bug反馈平台</h1>
+<p data-zh="帮助我们发现并修复模组中的问题，让游戏体验更好" data-en="Help us find and fix bugs in the mod for a better gaming experience">帮助我们发现并修复模组中的问题，让游戏体验更好</p>
+<div class="btn-group">
+<button class="btn btn-primary" onclick="showPage('submit')" data-zh="提交Bug" data-en="Submit Bug">提交Bug</button>
+<button class="btn btn-outline" onclick="showPage('list')" data-zh="查看Bug列表" data-en="View List">查看Bug列表</button>
+</div>
+</div>
+<div class="stats">
+<div class="stat-card"><div class="stat-num" id="stat-total">0</div><div class="stat-label" data-zh="已提交" data-en="Submitted">已提交</div></div>
+<div class="stat-card"><div class="stat-num" id="stat-processing">0</div><div class="stat-label" data-zh="处理中" data-en="Processing">处理中</div></div>
+<div class="stat-card"><div class="stat-num" id="stat-resolved">0</div><div class="stat-label" data-zh="已修复" data-en="Fixed">已修复</div></div>
+</div>
+
+<div class="list-header" style="margin-top:8px">
+<h3 data-zh="最新Bug" data-en="Latest Bugs">最新Bug</h3>
+<a style="cursor:pointer;color:#1976d2;font-size:13px;text-decoration:underline" onclick="showPage('list')" data-zh="查看全部" data-en="View All">查看全部</a>
+</div>
+<div class="bug-list" id="home-bug-list"></div>
+
+<div class="info-box">
+<h3 data-zh="Bug编号规则" data-en="Bug ID Format">Bug编号规则</h3>
+<p data-zh="Bug编号格式为 W-X（X为从1开始的正整数，按从小到大顺序排列，无上限）。编号由系统自动生成，无需手动填写。示例：W-1, W-2, W-3 ... W-10, W-11" data-en="Bug ID format: W-X (X is a positive integer starting from 1, sorted in ascending order, no upper limit). IDs are auto-generated. Examples: W-1, W-2, W-3 ... W-10, W-11">Bug编号格式为 W-X（X为从1开始的正整数，按从小到大顺序排列，无上限）。编号由系统自动生成，无需手动填写。示例：W-1, W-2, W-3 ... W-10, W-11</p>
+</div>
+<div class="privacy-note" data-zh="您的隐私对我们很重要，所有提交的信息仅用于模组Bug修复。" data-en="Your privacy matters. All submitted info is used only for bug fixing.">您的隐私对我们很重要，所有提交的信息仅用于模组Bug修复。</div>
+</div>
+
+<!-- 提交页 -->
+<div class="page" id="page-submit">
+<div class="form-card">
+<h2 class="form-title" data-zh="提交Bug反馈" data-en="Submit Bug Report">提交Bug反馈</h2>
+<p class="form-sub" data-zh="请详细描述您遇到的问题，帮助我们更好地修复" data-en="Please describe the issue in detail to help us fix it">请详细描述您遇到的问题，帮助我们更好地修复</p>
+
+<div id="success-box" class="success-box" style="display:none">
+<h3 data-zh="提交成功！" data-en="Submitted Successfully!">提交成功！</h3>
+<p data-zh="感谢您的反馈，我们会尽快处理" data-en="Thank you for your feedback, we will process it soon">感谢您的反馈，我们会尽快处理</p>
+<div class="bid" id="new-bug-id">W-1</div>
+<button class="btn btn-primary" onclick="showPage('list')" data-zh="查看Bug列表" data-en="View List">查看Bug列表</button>
+<button class="btn btn-outline" onclick="resetForm()" data-zh="继续提交" data-en="Submit Another">继续提交</button>
+</div>
+
+<div id="form-area">
+<div class="next-id" data-zh="下一个Bug编号：" data-en="Next Bug ID: ">下一个Bug编号：<strong id="next-id-display">W-1</strong> <span data-zh="（系统自动生成，无需填写）" data-en="(auto-generated, no need to fill)">（系统自动生成，无需填写）</span></div>
+<div class="privacy-banner" data-zh="我们承诺保护您的个人信息，仅用于Bug反馈沟通，不会用于任何商业用途。" data-en="We protect your personal info, used only for bug communication, never for commercial use.">我们承诺保护您的个人信息，仅用于Bug反馈沟通，不会用于任何商业用途。</div>
+
+<form id="bug-form" onsubmit="return submitBug(event)">
+<div class="form-group">
+<label class="form-label" data-zh="Bug标题" data-en="Bug Title">Bug标题 <span class="req">*</span></label>
+<input type="text" class="form-input" id="f-title" required placeholder="简要描述Bug内容">
+</div>
+
+<div class="form-row">
+<div class="form-group">
+<label class="form-label" data-zh="严重程度" data-en="Severity">严重程度 <span class="req">*</span></label>
+<div class="sev-opts">
+<div class="sev-opt sev-minor sel" data-val="minor" onclick="selectSev(this)" data-zh="轻微" data-en="Minor">轻微</div>
+<div class="sev-opt sev-moderate" data-val="moderate" onclick="selectSev(this)" data-zh="一般" data-en="Moderate">一般</div>
+<div class="sev-opt sev-severe" data-val="severe" onclick="selectSev(this)" data-zh="严重" data-en="Severe">严重</div>
+<div class="sev-opt sev-critical" data-val="critical" onclick="selectSev(this)" data-zh="致命" data-en="Critical">致命</div>
+<div class="sev-opt sev-improvement" data-val="improvement" onclick="selectSev(this)" data-zh="改进建议" data-en="Improvement">改进建议</div>
+</div>
+</div>
+<div class="form-group">
+<label class="form-label" data-zh="影响模块" data-en="Affected Module">影响模块 <span class="opt" data-zh="(选填)" data-en="(optional)">(选填)</span></label>
+<input type="text" class="form-input" id="f-module" placeholder="如：饮水机制、合成系统">
+</div>
+</div>
+
+<div class="form-group">
+<label class="form-label" data-zh="Bug描述" data-en="Description">Bug描述 <span class="req">*</span></label>
+<textarea class="form-textarea" id="f-desc" required placeholder="详细描述Bug的现象、发生条件等"></textarea>
+</div>
+
+<div class="form-group">
+<label class="form-label" data-zh="复现步骤" data-en="Steps to Reproduce">复现步骤 <span class="req">*</span></label>
+<textarea class="form-textarea" id="f-steps" required placeholder="1. 第一步...&#10;2. 第二步...&#10;3. ..."></textarea>
+</div>
+
+<div class="form-row">
+<div class="form-group">
+<label class="form-label" data-zh="姓名/昵称" data-en="Name">姓名/昵称 <span class="req">*</span></label>
+<input type="text" class="form-input" id="f-name" required placeholder="您的称呼">
+</div>
+<div class="form-group">
+<label class="form-label" data-zh="邮箱" data-en="Email">邮箱 <span class="opt" data-zh="(选填)" data-en="(optional)">(选填)</span></label>
+<input type="email" class="form-input" id="f-email" placeholder="用于接收修复进度通知">
+</div>
+</div>
+
+<button type="submit" class="submit-btn" data-zh="提交Bug" data-en="Submit Bug">提交Bug</button>
+</form>
+</div>
+</div>
+</div>
+
+<!-- 列表页 -->
+<div class="page" id="page-list">
+<div class="list-header">
+<h2 class="list-title" data-zh="Bug列表" data-en="Bug List">Bug列表</h2>
+<div class="filters">
+<select class="filter-sel" id="filter-status" onchange="renderList()">
+<option value="all" data-zh="全部状态" data-en="All Status">全部状态</option>
+<option value="pending" data-zh="待修复" data-en="Pending">待修复</option>
+<option value="processing" data-zh="处理中" data-en="Processing">处理中</option>
+<option value="resolved" data-zh="已修复" data-en="Resolved">已修复</option>
+<option value="wontfix" data-zh="不予修复" data-en="Won't Fix">不予修复</option>
+<option value="feature" data-zh="特性" data-en="Feature">特性</option>
+</select>
+<select class="filter-sel" id="filter-severity" onchange="renderList()">
+<option value="all" data-zh="全部严重程度" data-en="All Severity">全部严重程度</option>
+<option value="minor" data-zh="轻微" data-en="Minor">轻微</option>
+<option value="moderate" data-zh="一般" data-en="Moderate">一般</option>
+<option value="severe" data-zh="严重" data-en="Severe">严重</option>
+<option value="critical" data-zh="致命" data-en="Critical">致命</option>
+<option value="improvement" data-zh="改进建议" data-en="Improvement">改进建议</option>
+</select>
+</div>
+</div>
+<div class="bug-list" id="bug-list-container"></div>
+</div>
+
+<!-- 后台管理页 -->
+<div class="page" id="page-admin">
+<div class="admin-header">
+<h2 class="list-title" data-zh="后台管理" data-en="Admin Panel">后台管理</h2>
+<div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+<span class="admin-info" id="admin-status"></span>
+<button class="btn btn-danger btn-small" onclick="logout()" data-zh="退出登录" data-en="Logout">退出登录</button>
+</div>
+</div>
+<div class="stats">
+<div class="stat-card"><div class="stat-num" id="admin-stat-total">0</div><div class="stat-label" data-zh="总Bug数" data-en="Total">总Bug数</div></div>
+<div class="stat-card"><div class="stat-num" id="admin-stat-pending">0</div><div class="stat-label" data-zh="待修复" data-en="Pending">待修复</div></div>
+<div class="stat-card"><div class="stat-num" id="admin-stat-processing">0</div><div class="stat-label" data-zh="处理中" data-en="Processing">处理中</div></div>
+<div class="stat-card"><div class="stat-num" id="admin-stat-resolved">0</div><div class="stat-label" data-zh="已解决" data-en="Resolved">已解决</div></div>
+</div>
+<div class="list-header">
+<h3 data-zh="Bug管理列表" data-en="Bug Management">Bug管理列表</h3>
+<div class="filters">
+<select class="filter-sel" id="admin-filter-status" onchange="renderAdminList()">
+<option value="all" data-zh="全部状态" data-en="All Status">全部状态</option>
+<option value="pending" data-zh="待修复" data-en="Pending">待修复</option>
+<option value="processing" data-zh="处理中" data-en="Processing">处理中</option>
+<option value="resolved" data-zh="已修复" data-en="Resolved">已修复</option>
+<option value="wontfix" data-zh="不予修复" data-en="Won't Fix">不予修复</option>
+<option value="feature" data-zh="特性" data-en="Feature">特性</option>
+</select>
+</div>
+</div>
+<div class="bug-list" id="admin-list-container"></div>
+</div>
+
+</div>
+
+<!-- 登录弹窗 -->
+<div class="modal-overlay" id="login-modal">
+<div class="modal">
+<span class="modal-close" onclick="closeLogin()">&times;</span>
+<h2 data-zh="管理员登录" data-en="Admin Login">管理员登录</h2>
+<p data-zh="请输入管理密钥进入后台" data-en="Enter admin key to access the panel">请输入管理密钥进入后台</p>
+<input type="password" class="form-input" id="admin-key-input" placeholder="密钥" onkeydown="if(event.key==='Enter')doLogin()">
+<div class="error-msg" id="login-error" data-zh="密钥错误，请重试" data-en="Wrong key, please try again">密钥错误，请重试</div>
+<button class="btn btn-primary" style="width:100%;margin-top:16px" onclick="doLogin()" data-zh="登录" data-en="Login">登录</button>
+</div>
+</div>
+
+<footer class="footer">
+<p>&copy; 2026 Bug反馈平台 | loveaitiangongzuoshi.github.io/Better_Drinking</p>
+</footer>
+
+<script>
+var lang = 'zh';
+var selectedSev = 'minor';
+var ADMIN_KEY = 'yztgfchsuai';
+
+function getBugs(){
+  try{ return JSON.parse(localStorage.getItem('bugs')||'[]'); }
+  catch(e){ return []; }
+}
+function saveBugs(b){ localStorage.setItem('bugs', JSON.stringify(b)); }
+function getNextId(){ var b=getBugs(); return b.length+1; }
+function isAdmin(){ return sessionStorage.getItem('admin_logged_in')==='1'; }
+
+function showPage(p){
+  if(p==='admin' && !isAdmin()){ openLogin(); return; }
+  document.querySelectorAll('.page').forEach(function(el){el.classList.remove('active')});
+  document.getElementById('page-'+p).classList.add('active');
+  document.querySelectorAll('.nav a[data-page]').forEach(function(el){
+    el.classList.toggle('active', el.getAttribute('data-page')===p);
+  });
+  if(p==='list') renderList();
+  if(p==='home') updateStats();
+  if(p==='admin'){ updateAdminStats(); renderAdminList(); }
+  if(p==='submit') document.getElementById('next-id-display').textContent='W-'+getNextId();
+  window.scrollTo(0,0);
+}
+
+function toggleLang(){
+  lang = lang==='zh'?'en':'zh';
+  document.getElementById('langBtn').textContent = lang==='zh'?'EN':'中文';
+  document.documentElement.lang = lang==='zh'?'zh-CN':'en';
+  document.querySelectorAll('[data-zh]').forEach(function(el){
+    el.textContent = el.getAttribute('data-'+lang);
+  });
+  if(document.getElementById('page-list').classList.contains('active')) renderList();
+  if(document.getElementById('page-admin').classList.contains('active')) renderAdminList();
+  if(document.getElementById('page-home').classList.contains('active')) renderHomeBugList();
+}
+
+function selectSev(el){
+  document.querySelectorAll('.sev-opt').forEach(function(o){o.classList.remove('sel')});
+  el.classList.add('sel');
+  selectedSev = el.getAttribute('data-val');
+}
+
+function submitBug(e){
+  e.preventDefault();
+  var bugs = getBugs();
+  var newId = bugs.length + 1;
+  var bug = {
+    id: newId,
+    title: document.getElementById('f-title').value,
+    severity: selectedSev,
+    module: document.getElementById('f-module').value,
+    description: document.getElementById('f-desc').value,
+    steps: document.getElementById('f-steps').value,
+    submitter_name: document.getElementById('f-name').value,
+    submitter_email: document.getElementById('f-email').value,
+    status: 'pending',
+    created_at: new Date().toLocaleString('zh-CN')
+  };
+  bugs.push(bug);
+  saveBugs(bugs);
+  document.getElementById('new-bug-id').textContent = 'W-'+newId;
+  document.getElementById('form-area').style.display='none';
+  document.getElementById('success-box').style.display='block';
+  updateStats();
+  return false;
+}
+
+function resetForm(){
+  document.getElementById('bug-form').reset();
+  selectedSev='minor';
+  document.querySelectorAll('.sev-opt').forEach(function(o){o.classList.remove('sel')});
+  document.querySelector('.sev-minor').classList.add('sel');
+  document.getElementById('form-area').style.display='block';
+  document.getElementById('success-box').style.display='none';
+  document.getElementById('next-id-display').textContent='W-'+getNextId();
+}
+
+function updateStats(){
+  var bugs=getBugs();
+  document.getElementById('stat-total').textContent=bugs.length;
+  document.getElementById('stat-processing').textContent=bugs.filter(function(b){return b.status==='processing'}).length;
+  document.getElementById('stat-resolved').textContent=bugs.filter(function(b){return b.status==='resolved'}).length;
+  renderHomeBugList();
+}
+
+function renderHomeBugList(){
+  var bugs=getBugs().sort(function(a,b){return b.id-a.id}).slice(0,5);
+  var c=document.getElementById('home-bug-list');
+  if(!c) return;
+  if(bugs.length===0){
+    c.innerHTML='<div class="empty" style="padding:30px"><p>'+(lang==='zh'?'还没有提交的Bug，快来提交第一个吧！':'No bugs yet, submit the first one!')+'</p></div>';
+    return;
+  }
+  c.innerHTML=bugs.map(function(b){
+    return '<div class="bug-item" style="cursor:pointer" onclick="showPage(\'list\')">'+
+      '<div class="bug-head"><span class="bug-id">W-'+b.id+'</span><span class="bug-status st-'+b.status+'">'+statusText(b.status)+'</span></div>'+
+      '<div class="bug-title">'+esc(b.title)+'</div>'+
+      '<div class="bug-meta">'+
+        '<span class="bug-sev sev-'+b.severity+'">'+sevText(b.severity)+'</span>'+
+        '<span>'+(lang==='zh'?'提交人：':'By: ')+esc(b.submitter_name)+'</span>'+
+        '<span>'+esc(b.created_at)+'</span>'+
+      '</div>'+
+    '</div>';
+  }).join('');
+}
+
+function updateAdminStats(){
+  var bugs=getBugs();
+  document.getElementById('admin-stat-total').textContent=bugs.length;
+  document.getElementById('admin-stat-pending').textContent=bugs.filter(function(b){return b.status==='pending'}).length;
+  document.getElementById('admin-stat-processing').textContent=bugs.filter(function(b){return b.status==='processing'}).length;
+  document.getElementById('admin-stat-resolved').textContent=bugs.filter(function(b){return b.status==='resolved'}).length;
+  document.getElementById('admin-status').textContent = lang==='zh' ? '已登录' : 'Logged in';
+}
+
+function sevText(s){
+  var m={minor:['轻微','Minor'],moderate:['一般','Moderate'],severe:['严重','Severe'],critical:['致命','Critical'],improvement:['改进建议','Improvement']};
+  return m[s]?m[s][lang==='zh'?0:1]:s;
+}
+function statusText(s){
+  var m={pending:['待修复','Pending'],processing:['处理中','Processing'],resolved:['已修复','Resolved'],wontfix:['不予修复',"Won't Fix"],feature:['特性','Feature']};
+  return m[s]?m[s][lang==='zh'?0:1]:s;
+}
+
+function renderList(){
+  var bugs=getBugs();
+  var fs=document.getElementById('filter-status').value;
+  var fv=document.getElementById('filter-severity').value;
+  if(fs!=='all') bugs=bugs.filter(function(b){return b.status===fs});
+  if(fv!=='all') bugs=bugs.filter(function(b){return b.severity===fv});
+  bugs.sort(function(a,b){return a.id-b.id});
+  var c=document.getElementById('bug-list-container');
+  if(bugs.length===0){
+    c.innerHTML='<div class="empty"><div class="empty-icon">---</div><p>'+(lang==='zh'?'还没有提交的Bug':'No bugs submitted yet')+'</p><button class="btn btn-primary" style="margin-top:16px" onclick="showPage(\'submit\')">'+(lang==='zh'?'提交第一个Bug':'Submit First Bug')+'</button></div>';
+    return;
+  }
+  c.innerHTML=bugs.map(function(b){
+    return '<div class="bug-item">'+
+      '<div class="bug-head"><span class="bug-id">W-'+b.id+'</span><span class="bug-status st-'+b.status+'">'+statusText(b.status)+'</span></div>'+
+      '<div class="bug-title">'+esc(b.title)+'</div>'+
+      '<div class="bug-meta">'+
+        '<span class="bug-sev sev-'+b.severity+'">'+sevText(b.severity)+'</span>'+
+        '<span>'+(lang==='zh'?'模块：':'Module: ')+esc(b.module||'-')+'</span>'+
+        '<span>'+(lang==='zh'?'提交人：':'By: ')+esc(b.submitter_name)+'</span>'+
+        '<span>'+esc(b.created_at)+'</span>'+
+      '</div>'+
+      '<div class="bug-desc">'+esc(b.description)+'</div>'+
+      '<div class="bug-steps">'+(lang==='zh'?'复现步骤：\n':'Steps:\n')+esc(b.steps)+'</div>'+
+    '</div>';
+  }).join('');
+}
+
+function renderAdminList(){
+  if(!isAdmin()) return;
+  var bugs=getBugs();
+  var fs=document.getElementById('admin-filter-status').value;
+  if(fs!=='all') bugs=bugs.filter(function(b){return b.status===fs});
+  bugs.sort(function(a,b){return a.id-b.id});
+  var c=document.getElementById('admin-list-container');
+  if(bugs.length===0){
+    c.innerHTML='<div class="empty"><div class="empty-icon">---</div><p>'+(lang==='zh'?'没有Bug':'No bugs')+'</p></div>';
+    return;
+  }
+  c.innerHTML=bugs.map(function(b){
+    return '<div class="bug-item">'+
+      '<div class="bug-head"><span class="bug-id">W-'+b.id+'</span>'+
+        '<select class="filter-sel" onchange="changeStatus('+b.id+',this.value)" style="font-size:12px">'+
+          '<option value="pending" '+(b.status==='pending'?'selected':'')+'>'+(lang==='zh'?'待修复':'Pending')+'</option>'+
+          '<option value="processing" '+(b.status==='processing'?'selected':'')+'>'+(lang==='zh'?'处理中':'Processing')+'</option>'+
+          '<option value="resolved" '+(b.status==='resolved'?'selected':'')+'>'+(lang==='zh'?'已修复':'Resolved')+'</option>'+
+          '<option value="wontfix" '+(b.status==='wontfix'?'selected':'')+'>'+(lang==='zh'?'不予修复':"Won't Fix")+'</option>'+
+          '<option value="feature" '+(b.status==='feature'?'selected':'')+'>'+(lang==='zh'?'特性':'Feature')+'</option>'+
+        '</select>'+
+      '</div>'+
+      '<div class="bug-title">'+esc(b.title)+'</div>'+
+      '<div class="bug-meta">'+
+        '<span class="bug-sev sev-'+b.severity+'">'+sevText(b.severity)+'</span>'+
+        '<span>'+(lang==='zh'?'模块：':'Module: ')+esc(b.module||'-')+'</span>'+
+        '<span>'+(lang==='zh'?'提交人：':'By: ')+esc(b.submitter_name)+'</span>'+
+        '<span>'+esc(b.created_at)+'</span>'+
+      '</div>'+
+      (b.submitter_email?'<div class="bug-email">'+(lang==='zh'?'邮箱：':'Email: ')+esc(b.submitter_email)+'</div>':'')+
+      '<div class="bug-desc">'+esc(b.description)+'</div>'+
+      '<div class="bug-steps">'+(lang==='zh'?'复现步骤：\n':'Steps:\n')+esc(b.steps)+'</div>'+
+      '<div class="bug-actions">'+
+        '<button class="btn btn-danger btn-small" onclick="deleteBug('+b.id+')">'+(lang==='zh'?'删除':'Delete')+'</button>'+
+      '</div>'+
+    '</div>';
+  }).join('');
+}
+
+function changeStatus(id, status){
+  var bugs=getBugs();
+  for(var i=0;i<bugs.length;i++){
+    if(bugs[i].id===id){ bugs[i].status=status; break; }
+  }
+  saveBugs(bugs);
+  updateAdminStats();
+  updateStats();
+}
+
+function deleteBug(id){
+  if(!confirm(lang==='zh'?'确定要删除这个Bug吗？此操作不可恢复。':'Delete this bug? This cannot be undone.')) return;
+  var bugs=getBugs().filter(function(b){return b.id!==id});
+  saveBugs(bugs);
+  renderAdminList();
+  updateAdminStats();
+  updateStats();
+}
+
+function openAdmin(){
+  if(isAdmin()){ showPage('admin'); }
+  else{ openLogin(); }
+}
+
+function openLogin(){
+  document.getElementById('login-modal').classList.add('show');
+  document.getElementById('admin-key-input').value='';
+  document.getElementById('login-error').style.display='none';
+  setTimeout(function(){document.getElementById('admin-key-input').focus()},100);
+}
+
+function closeLogin(){
+  document.getElementById('login-modal').classList.remove('show');
+}
+
+function doLogin(){
+  var key=document.getElementById('admin-key-input').value;
+  if(key===ADMIN_KEY){
+    sessionStorage.setItem('admin_logged_in','1');
+    closeLogin();
+    showPage('admin');
+  }else{
+    document.getElementById('login-error').style.display='block';
+  }
+}
+
+function logout(){
+  sessionStorage.removeItem('admin_logged_in');
+  showPage('home');
+}
+
+function esc(s){
+  var d=document.createElement('div');
+  d.textContent=s||'';
+  return d.innerHTML;
+}
+
+// 点击弹窗外部关闭
+document.getElementById('login-modal').addEventListener('click',function(e){
+  if(e.target===this) closeLogin();
+});
+
+updateStats();
+</script>
+</body>
+</html>
