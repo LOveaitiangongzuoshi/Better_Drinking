@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>后台管理 - Better Drinking Bug反馈平台</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:Arial,"Microsoft YaHei",sans-serif;background:#f0f2f5;color:#333;line-height:1.6}
+.header{background:#fff;border-bottom:1px solid #e0e0e0;padding:0 20px;position:sticky;top:0;z-index:100}
+.header-inner{max-width:1100px;margin:0 auto;display:flex;justify-content:space-between;align-items:center;height:60px}
+.logo{font-size:18px;font-weight:bold;color:#1976d2;display:flex;align-items:center;gap:8px}
+.logo-dot{width:28px;height:28px;background:#1976d2;border-radius:6px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:14px}
+.container{max-width:1100px;margin:0 auto;padding:24px 20px}
+.admin-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;flex-wrap:wrap;gap:10px}
+.admin-title{font-size:22px}
+.admin-info{font-size:13px;color:#666}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:16px;margin:20px 0}
+.stat-card{background:#fff;padding:20px;border-radius:10px;text-align:center;border:1px solid #e8e8e8}
+.stat-num{font-size:32px;font-weight:bold;color:#1976d2;margin-bottom:4px}
+.stat-label{font-size:13px;color:#888}
+.filters{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px}
+.filter-sel{padding:7px 10px;border:1px solid #ddd;border-radius:6px;font-size:13px}
+.bug-list{display:flex;flex-direction:column;gap:12px}
+.bug-item{background:#fff;padding:18px 20px;border-radius:10px;border:1px solid #e8e8e8}
+.bug-head{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px;flex-wrap:wrap;gap:8px}
+.bug-id{font-weight:600;color:#1976d2;font-size:14px}
+.bug-status{padding:3px 10px;border-radius:10px;font-size:11px;font-weight:600}
+.st-pending{background:#fff9c4;color:#f9a825}
+.st-processing{background:#e3f2fd;color:#1565c0}
+.st-resolved{background:#e8f5e9;color:#2e7d32}
+.st-wontfix{background:#ffebee;color:#c62828}
+.st-feature{background:#f3e5f5;color:#7b1fa2}
+.bug-title{font-size:16px;font-weight:600;margin-bottom:6px;color:#222}
+.bug-meta{display:flex;gap:12px;font-size:12px;color:#888;flex-wrap:wrap;margin-bottom:6px}
+.bug-sev{padding:2px 7px;border-radius:4px;font-size:11px;font-weight:600}
+.sev-minor{background:#e8f5e9;color:#43a047}
+.sev-moderate{background:#fff3e0;color:#fb8c00}
+.sev-severe{background:#ffebee;color:#e53935}
+.sev-critical{background:#f3e5f5;color:#8e24aa}
+.sev-improvement{background:#e0f7fa;color:#00838f}
+.bug-desc{font-size:13px;color:#555;margin-bottom:6px;white-space:pre-wrap}
+.bug-steps{font-size:12px;color:#777;background:#f9f9f9;padding:8px 12px;border-radius:6px;white-space:pre-wrap}
+.bug-email{font-size:12px;color:#1976d2;margin-top:6px}
+.bug-actions{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}
+.btn{padding:6px 12px;border-radius:4px;font-size:12px;cursor:pointer;border:none;transition:all .2s;font-weight:500}
+.btn-danger{background:#f44336;color:#fff}
+.btn-danger:hover{background:#d32f2f}
+.btn-primary{background:#1976d2;color:#fff}
+.btn-primary:hover{background:#1565c0}
+.btn-logout{background:#666;color:#fff}
+.btn-logout:hover{background:#444}
+.empty{text-align:center;padding:60px 20px;color:#aaa}
+.empty-icon{font-size:42px;margin-bottom:12px}
+.footer{text-align:center;padding:24px 20px;color:#aaa;font-size:12px;border-top:1px solid #e8e8e8;margin-top:40px}
+/* 登录界面 */
+.login-box{max-width:400px;margin:80px auto;background:#fff;padding:40px;border-radius:12px;box-shadow:0 2px 12px rgba(0,0,0,0.1)}
+.login-title{font-size:22px;font-weight:bold;text-align:center;margin-bottom:8px;color:#1976d2}
+.login-subtitle{font-size:13px;color:#888;text-align:center;margin-bottom:24px}
+.form-group{margin-bottom:16px}
+.form-label{display:block;font-size:13px;font-weight:600;margin-bottom:6px;color:#555}
+.form-input{width:100%;padding:10px 12px;border:1px solid #ddd;border-radius:6px;font-size:14px;transition:border-color .2s}
+.form-input:focus{outline:none;border-color:#1976d2}
+.login-btn{width:100%;padding:12px;background:#1976d2;color:#fff;border:none;border-radius:6px;font-size:15px;font-weight:600;cursor:pointer;transition:background .2s}
+.login-btn:hover{background:#1565c0}
+.login-error{color:#f44336;font-size:13px;text-align:center;margin-top:12px;display:none}
+.hidden{display:none !important}
+@media(max-width:640px){
+  .hero h1{font-size:24px}
+}
+</style>
+</head>
+<body>
+
+<header class="header">
+<div class="header-inner">
+<div class="logo">
+<span class="logo-dot">B</span>
+<span>后台管理 - Better Drinking</span>
+</div>
+<div class="admin-info" id="admin-status">未登录</div>
+</div>
+</header>
+
+<!-- 登录界面 -->
+<div class="login-box" id="login-box">
+<div class="login-title">管理员登录</div>
+<div class="login-subtitle">请输入管理员账号密码</div>
+<div class="form-group">
+<label class="form-label">邮箱</label>
+<input type="email" class="form-input" id="login-email" placeholder="admin@betterdrinking.com">
+</div>
+<div class="form-group">
+<label class="form-label">密码</label>
+<input type="password" class="form-input" id="login-password" placeholder="请输入密码" onkeydown="if(event.key==='Enter')doLogin()">
+</div>
+<button class="login-btn" onclick="doLogin()">登录</button>
+<div class="login-error" id="login-error">邮箱或密码错误，请重试</div>
+</div>
+
+<!-- 管理界面 -->
+<div class="container hidden" id="admin-container">
+<div class="admin-header">
+<h2 class="admin-title">Bug管理后台</h2>
+<div>
+<select class="filter-sel" id="filter-status" onchange="renderList()">
+<option value="all">全部状态</option>
+<option value="pending">待修复</option>
+<option value="processing">处理中</option>
+<option value="resolved">已修复</option>
+<option value="wontfix">不予修复</option>
+<option value="feature">特性</option>
+</select>
+<button class="btn btn-primary" onclick="refreshData()">刷新</button>
+<button class="btn btn-logout" onclick="doLogout()">退出登录</button>
+</div>
+</div>
+
+<div class="stats">
+<div class="stat-card"><div class="stat-num" id="stat-total">0</div><div class="stat-label">总Bug数</div></div>
+<div class="stat-card"><div class="stat-num" id="stat-pending">0</div><div class="stat-label">待修复</div></div>
+<div class="stat-card"><div class="stat-num" id="stat-processing">0</div><div class="stat-label">处理中</div></div>
+<div class="stat-card"><div class="stat-num" id="stat-resolved">0</div><div class="stat-label">已修复</div></div>
+</div>
+
+<div class="bug-list" id="bug-list-container">
+<div class="empty"><div class="empty-icon">---</div><p>加载中...</p></div>
+</div>
+</div>
+
+<div class="footer">
+© 2026 Bug反馈平台后台管理 | loveaitiangongzuoshi.github.io/Better_Drinking
+</div>
+
+<script>
+// Supabase配置 - 只用公开的anon key，不用Secret Key！
+const SUPABASE_URL = 'https://fmumxkriynocaalyrmjc.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZtdW14a3JpeW5vY2FhbHlybWpjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODg1Mjk4NjYsImV4cCI6MjEwNDEwNTg2Nn0.1LJ5U7Rzh4JeCKkPhN9SunS7e2o4-XDMF-ayUd4OymE';
+
+// 存储登录后的access token
+var accessToken = null;
+
+// 通用请求头（未登录用anon key，登录后用access token）
+function getHeaders(){
+  var headers = {
+    'apikey': SUPABASE_ANON_KEY,
+    'Content-Type': 'application/json'
+  };
+  if(accessToken){
+    headers['Authorization'] = 'Bearer ' + accessToken;
+  }else{
+    headers['Authorization'] = 'Bearer ' + SUPABASE_ANON_KEY;
+  }
+  return headers;
+}
+
+// 登录
+async function doLogin(){
+  var email = document.getElementById('login-email').value;
+  var password = document.getElementById('login-password').value;
+  var errorBox = document.getElementById('login-error');
+  
+  try{
+    const res = await fetch(SUPABASE_URL + '/auth/v1/token?grant_type=password', {
+      method: 'POST',
+      headers: {
+        'apikey': SUPABASE_ANON_KEY,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ email: email, password: password })
+    });
+    
+    if(!res.ok){
+      errorBox.style.display = 'block';
+      return;
+    }
+    
+    const data = await res.json();
+    accessToken = data.access_token;
+    // 保存到sessionStorage，刷新页面不用重新登录
+    sessionStorage.setItem('admin_access_token', accessToken);
+    
+    // 显示管理界面
+    document.getElementById('login-box').classList.add('hidden');
+    document.getElementById('admin-container').classList.remove('hidden');
+    document.getElementById('admin-status').textContent = '已登录';
+    
+    await updateStats();
+    await renderList();
+  }catch(e){
+    errorBox.style.display = 'block';
+  }
+}
+
+// 退出登录
+function doLogout(){
+  accessToken = null;
+  sessionStorage.removeItem('admin_access_token');
+  document.getElementById('login-box').classList.remove('hidden');
+  document.getElementById('admin-container').classList.add('hidden');
+  document.getElementById('admin-status').textContent = '未登录';
+  document.getElementById('login-password').value = '';
+  document.getElementById('login-error').style.display = 'none';
+}
+
+// 检查是否已登录
+function checkLogin(){
+  var savedToken = sessionStorage.getItem('admin_access_token');
+  if(savedToken){
+    accessToken = savedToken;
+    document.getElementById('login-box').classList.add('hidden');
+    document.getElementById('admin-container').classList.remove('hidden');
+    document.getElementById('admin-status').textContent = '已登录';
+    updateStats();
+    renderList();
+  }
+}
+
+// 从Supabase获取所有Bug
+async function getBugs(){
+  try{
+    const res = await fetch(SUPABASE_URL + '/rest/v1/bug?select=*&order=id.asc', {
+      method: 'GET',
+      headers: getHeaders()
+    });
+    if(!res.ok){
+      const errText = await res.text();
+      alert('查询失败：' + res.status + ' ' + res.statusText + '\n' + errText);
+      return [];
+    }
+    const data = await res.json();
+    return data || [];
+  }catch(e){
+    alert('查询异常：' + e.message);
+    return [];
+  }
+}
+
+async function updateStats(){
+  var bugs = await getBugs();
+  document.getElementById('stat-total').textContent=bugs.length;
+  document.getElementById('stat-pending').textContent=bugs.filter(function(b){return b.status==='pending'}).length;
+  document.getElementById('stat-processing').textContent=bugs.filter(function(b){return b.status==='processing'}).length;
+  document.getElementById('stat-resolved').textContent=bugs.filter(function(b){return b.status==='resolved'}).length;
+}
+
+function sevText(s){
+  var m={minor:'轻微',moderate:'一般',severe:'严重',critical:'致命',improvement:'改进建议'};
+  return m[s]||s;
+}
+function statusText(s){
+  var m={pending:'待修复',processing:'处理中',resolved:'已修复',wontfix:'不予修复',feature:'特性'};
+  return m[s]||s;
+}
+function formatDate(dateStr){
+  if(!dateStr) return '';
+  try{
+    var d = new Date(dateStr);
+    return d.toLocaleString('zh-CN');
+  }catch(e){ return dateStr; }
+}
+function esc(s){
+  var d=document.createElement('div');
+  d.textContent=s||'';
+  return d.innerHTML;
+}
+
+async function renderList(){
+  var bugs = await getBugs();
+  var fs=document.getElementById('filter-status').value;
+  if(fs!=='all') bugs=bugs.filter(function(b){return b.status===fs});
+  bugs.sort(function(a,b){return a.id-b.id});
+  var c=document.getElementById('bug-list-container');
+  if(bugs.length===0){
+    c.innerHTML='<div class="empty"><div class="empty-icon">---</div><p>没有Bug</p></div>';
+    return;
+  }
+  c.innerHTML=bugs.map(function(b){
+    return '<div class="bug-item">'+
+      '<div class="bug-head"><span class="bug-id">W-'+b.id+'</span>'+
+        '<select class="filter-sel" onchange="changeStatus('+b.id+',this.value)" style="font-size:12px">'+
+          '<option value="pending" '+(b.status==='pending'?'selected':'')+'>待修复</option>'+
+          '<option value="processing" '+(b.status==='processing'?'selected':'')+'>处理中</option>'+
+          '<option value="resolved" '+(b.status==='resolved'?'selected':'')+'>已修复</option>'+
+          '<option value="wontfix" '+(b.status==='wontfix'?'selected':'')+'>不予修复</option>'+
+          '<option value="feature" '+(b.status==='feature'?'selected':'')+'>特性</option>'+
+        '</select>'+
+      '</div>'+
+      '<div class="bug-title">'+esc(b.title)+'</div>'+
+      '<div class="bug-meta">'+
+        '<span class="bug-sev sev-'+b.severity+'">'+sevText(b.severity)+'</span>'+
+        '<span>模块：'+esc(b.module||'-')+'</span>'+
+        '<span>提交人：'+esc(b.submitter_name)+'</span>'+
+        '<span>'+formatDate(b.created_at)+'</span>'+
+      '</div>'+
+      (b.submitter_email?'<div class="bug-email">邮箱：'+esc(b.submitter_email)+'</div>':'')+
+      '<div class="bug-desc">'+esc(b.description)+'</div>'+
+      '<div class="bug-steps">复现步骤：\n'+esc(b.steps)+'</div>'+
+      '<div class="bug-actions">'+
+        '<button class="btn btn-danger" onclick="deleteBug('+b.id+')">删除</button>'+
+      '</div>'+
+    '</div>';
+  }).join('');
+}
+
+async function changeStatus(id, status){
+  try{
+    const res = await fetch(SUPABASE_URL + '/rest/v1/bug?id=eq.' + id, {
+      method: 'PATCH',
+      headers: getHeaders(),
+      body: JSON.stringify({ status: status })
+    });
+    if(!res.ok){
+      alert('更新失败：' + res.status + ' ' + res.statusText + '\n可能是没有登录或权限不足');
+      return;
+    }
+    await updateStats();
+    await renderList();
+  }catch(e){
+    alert('更新异常：' + e.message);
+  }
+}
+
+async function deleteBug(id){
+  if(!confirm('确定要删除这个Bug吗？此操作不可恢复。')) return;
+  try{
+    const res = await fetch(SUPABASE_URL + '/rest/v1/bug?id=eq.' + id, {
+      method: 'DELETE',
+      headers: getHeaders()
+    });
+    if(!res.ok){
+      alert('删除失败：' + res.status + ' ' + res.statusText + '\n可能是没有登录或权限不足');
+      return;
+    }
+    await updateStats();
+    await renderList();
+  }catch(e){
+    alert('删除异常：' + e.message);
+  }
+}
+
+async function refreshData(){
+  await updateStats();
+  await renderList();
+}
+
+// 页面初始化 - 检查是否已登录
+checkLogin();
+</script>
+</body>
+</html>
